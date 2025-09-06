@@ -1,0 +1,3 @@
+Product1
+NotANumber
+2.0

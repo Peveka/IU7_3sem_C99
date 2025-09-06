@@ -1,0 +1,10 @@
+Structure contents:
+Product1
+5.000000
+1.000000
+Product2
+10.000000
+2.000000
+Product3
+15.000000
+3.000000

@@ -1,0 +1,9 @@
+ProductLow
+0.001
+0.001
+ProductMed
+1.0
+1.0
+ProductLar
+1000.0
+1000.0

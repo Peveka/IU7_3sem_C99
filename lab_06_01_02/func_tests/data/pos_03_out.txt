@@ -1,0 +1,6 @@
+Found: Apple_Red
+3.000000
+1.500000
+Found: Apple_Green
+2.800000
+1.400000

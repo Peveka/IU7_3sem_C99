@@ -38,18 +38,27 @@ void scan_struct(error_t* rc, int* indx, FILE* file, item_t* items)
 
         if (!file_read_line(file, line, sizeof(line)))
         {
-            *rc = ERROR_INVALID_DATA;
+            if (*indx > 0) {
+                *rc = OK; 
+                break;
+            } else {
+                *rc = ERROR_EMPTY_FILE;
+                break;
+            }
+        }
+
+        if (strlen(line) == 0) {
             continue;
         }
         
-        if (*rc == OK && strlen(line) >= MAX_NAME_LEN)
+        if (strlen(line) >= MAX_NAME_LEN)
         {
             *rc = ERROR_NAME_TOO_LONG;
             continue;
         }
 
         if (!file_read_line(file, mass_line, sizeof(mass_line)) ||
-        !file_read_line(file, vol_line, sizeof(vol_line)))
+            !file_read_line(file, vol_line, sizeof(vol_line)))
         {
             *rc = ERROR_NOT_ENOUGH_DATA;
             continue;
@@ -57,7 +66,7 @@ void scan_struct(error_t* rc, int* indx, FILE* file, item_t* items)
 
         double mass, volume;
         *rc = analyze_data(mass_line, vol_line, &mass, &volume);
-        if (rc != OK)
+        if (*rc != OK)
             continue;
 
         append_struct_item(mass, volume, line, *indx, items);
