@@ -82,6 +82,9 @@ void scan_struct(error_t *rc, int *indx, FILE *file, item_t *items)
         append_struct_item(mass, volume, line, *indx, items);
         ++(*indx);
     }
+
+    if (*indx == MAX_AR_LEN && !feof(file))
+        *rc = ERROR_TOO_MANY_STRINGS;
 }
 
 error_t handle_struct_scan(item_t *items, const char *filename, int *count_ptr)
