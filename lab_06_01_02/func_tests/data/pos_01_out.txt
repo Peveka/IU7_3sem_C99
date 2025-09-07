@@ -1,4 +1,3 @@
-Structure contents:
 ProductB
 10.000000
 2.000000

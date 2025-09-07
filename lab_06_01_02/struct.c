@@ -1,26 +1,31 @@
-#include "struct.h"
+#include <strings.h>
 #include <string.h>
 #include <math.h>
-#include <float.h>
 #include <stdio.h>
 #include "data.h"
 #include "io.h"
 #include "errors.h"
+#include "struct.h"
 
 int compare_double(double a, double b, double epsilon)
 {
-    if (fabs(a - b) < epsilon) return 0;
-    return ((a > b) ? 1 : -1);
+    int rc;
+    if (fabs(a - b) < epsilon) 
+        rc = 0;
+    else
+        rc = ((a > b) ? 1 : -1);
+
+    return rc;
 }
 
-void swap_items(item_t* a, item_t* b)
+void swap_items(item_t *a, item_t *b)
 {
     item_t tmp = *a;
     *a = *b;
     *b = tmp;
 }
 
-void append_struct_item(double mass, double volume, const char* line, int indx, item_t* items)
+void append_struct_item(double mass, double volume, const char *line, int indx, item_t *items)
 {
     strncpy(items[indx].name, line, MAX_NAME_LEN - 1);
     items[indx].name[MAX_NAME_LEN - 1] = '\0';
@@ -28,7 +33,7 @@ void append_struct_item(double mass, double volume, const char* line, int indx, 
     items[indx].volume = volume;
 }
 
-void scan_struct(error_t* rc, int* indx, FILE* file, item_t* items)
+void scan_struct(error_t *rc, int *indx, FILE *file, item_t *items)
 {
     while (*indx < MAX_AR_LEN && *rc == OK)
     {
@@ -38,16 +43,20 @@ void scan_struct(error_t* rc, int* indx, FILE* file, item_t* items)
 
         if (!file_read_line(file, line, sizeof(line)))
         {
-            if (*indx > 0) {
+            if (*indx > 0) 
+            {
                 *rc = OK; 
                 break;
-            } else {
+            } 
+            else 
+            {
                 *rc = ERROR_EMPTY_FILE;
                 break;
             }
         }
 
-        if (strlen(line) == 0) {
+        if (strlen(line) == 0) 
+        {
             continue;
         }
         
@@ -57,8 +66,9 @@ void scan_struct(error_t* rc, int* indx, FILE* file, item_t* items)
             continue;
         }
 
-        if (!file_read_line(file, mass_line, sizeof(mass_line)) ||
-            !file_read_line(file, vol_line, sizeof(vol_line)))
+        int mass_read = file_read_line(file, mass_line, sizeof(mass_line));
+        int volume_read = file_read_line(file, vol_line, sizeof(vol_line));
+        if (!mass_read || !volume_read)
         {
             *rc = ERROR_NOT_ENOUGH_DATA;
             continue;
@@ -74,7 +84,7 @@ void scan_struct(error_t* rc, int* indx, FILE* file, item_t* items)
     }
 }
 
-error_t handle_struct_scan(item_t* items, const char* filename, int* count_ptr)
+error_t handle_struct_scan(item_t *items, const char *filename, int *count_ptr)
 {
     error_t rc = OK;
     FILE* file = fopen(filename, "r");
@@ -98,7 +108,7 @@ error_t handle_struct_scan(item_t* items, const char* filename, int* count_ptr)
     return rc;
 }
 
-void sort_struct(item_t* items, int count)
+void sort_struct(item_t *items, int count)
 {
     for (int i = 1; i < count; i++)
     {
@@ -112,20 +122,21 @@ void sort_struct(item_t* items, int count)
             {
                 swap_items(&items[k - 1], &items[k]);
                 k--;
-            } else
+            } 
+            else
                 break;
         }
     }
 }
 
-error_t search_string(item_t* items, int count, const char* prefix)
+error_t search_string(item_t *items, int count, const char *prefix)
 {
     error_t found = ERROR_STRING_NOT_FOUND;
     for (int i = 0; i < count; i++)
     {
-        if (strncmp(items[i].name, prefix, strlen(prefix)) == 0)
+        if (strncasecmp(items[i].name, prefix, strlen(prefix)) == 0)
         {
-            printf("Found: %s\n%.6lf\n%.6lf\n", items[i].name, items[i].weight, items[i].volume);
+            printf("%s\n%.6lf\n%.6lf\n", items[i].name, items[i].weight, items[i].volume);
             found = OK;
         }
     }

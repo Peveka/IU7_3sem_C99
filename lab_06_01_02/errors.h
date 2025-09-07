@@ -1,7 +1,9 @@
 #ifndef ERRORS_H__
+
 #define ERRORS_H__
 
-typedef enum {
+typedef enum
+{
     OK,
     ERROR_INVALID_DATA,
     ERROR_FILE_OPEN,

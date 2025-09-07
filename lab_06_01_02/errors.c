@@ -6,7 +6,7 @@ void handle_error(error_t error)
     switch (error)
     {
         case ERROR_NOT_ENOUGH_ARGUMENTS:
-            printf("Not enough command-line arguments!\n");
+            printf("Not enough command line arguments!\n");
             break;
         case ERROR_FILE_OPEN:
             printf("Failed to open file!\n");

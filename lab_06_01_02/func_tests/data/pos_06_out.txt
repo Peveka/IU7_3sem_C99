@@ -1,4 +1,3 @@
-Structure contents:
 ProductLow
 0.001000
 0.001000

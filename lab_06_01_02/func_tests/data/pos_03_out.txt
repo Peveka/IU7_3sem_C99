@@ -1,6 +1,9 @@
-Found: Apple_Red
+Apple_Red
 3.000000
 1.500000
-Found: Apple_Green
+Apple_Green
 2.800000
 1.400000
+apple_yammy
+1.000000
+0.900000
