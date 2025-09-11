@@ -6,26 +6,29 @@
 
 int file_read_line(FILE *file, char *line, size_t line_size)
 {
+    int rc = 1;
     if (!fgets(line, line_size, file))
-        return 0;
+        rc = 0;
 
-    size_t len = strlen(line);
-    
-    while (len > 0 && (line[len - 1] == '\n' || line[len - 1] == '\r')) 
+    if (rc == 1) 
     {
-        line[len - 1] = '\0';
-        len--;
+        size_t len = strlen(line);
+        while (len > 0 && (line[len - 1] == '\n' || line[len - 1] == '\r')) 
+        {
+            line[len - 1] = '\0';
+            len--;
+        }
     }
-
-    return 1;
+    
+    return rc;
 }
 
 error_t analyze_data(const char *mass_line, const char *vol_line, double *mass, double *volume)
 {
     error_t rc = OK;
     int mass_scanned = sscanf(mass_line, "%lf", mass);
-    int vol_scnned = sscanf(vol_line, "%lf", volume) != 1;
-    if (mass_scanned == 1 || vol_scnned == 1)
+    int vol_scanned = sscanf(vol_line, "%lf", volume);
+    if (mass_scanned == 1 && vol_scanned == 1)
     {
         int mass_valid = compare_double(*mass, 0.0, DBL_EPSILON);
         int vol_valid = compare_double(*volume, 0.0, DBL_EPSILON);

@@ -33,81 +33,115 @@ void append_struct_item(double mass, double volume, const char *line, int indx, 
     items[indx].volume = volume;
 }
 
-void scan_struct(error_t *rc, int *indx, FILE *file, item_t *items)
+error_t read_name(FILE *file, char *line, size_t line_size, int indx)
 {
-    while (*indx < MAX_AR_LEN && *rc == OK)
+    error_t rc = OK;
+    
+    if (!file_read_line(file, line, line_size))
     {
-        char line[MAX_LINE_LEN];
-        char mass_line[MAX_LINE_LEN];
-        char vol_line[MAX_LINE_LEN];
-
-        if (!file_read_line(file, line, sizeof(line)))
-        {
-            if (*indx > 0) 
-            {
-                *rc = OK; 
-                break;
-            } 
-            else 
-            {
-                *rc = ERROR_EMPTY_FILE;
-                break;
-            }
-        }
-
+        rc = (indx > 0) ? OK : ERROR_EMPTY_FILE;
+    }
+    else
+    {
         if (strlen(line) == 0) 
         {
-            continue;
+            rc = ERROR_INVALID_DATA;
         }
+        else if (strlen(line) >= MAX_NAME_LEN)
+        {
+            rc = ERROR_NAME_TOO_LONG;
+        }
+    }
+    
+    return rc;
+}
+
+error_t read_mass_volume(FILE *file, double *mass, double *volume)
+{
+    error_t rc = OK;
+    char mass_line[MAX_LINE_LEN];
+    char vol_line[MAX_LINE_LEN];
+    
+    int mass_read = file_read_line(file, mass_line, sizeof(mass_line));
+    int volume_read = file_read_line(file, vol_line, sizeof(vol_line));
+    
+    if (!mass_read || !volume_read)
+    {
+        rc = ERROR_NOT_ENOUGH_DATA;
+    }
+    else
+    {
+        rc = analyze_data(mass_line, vol_line, mass, volume);
+    }
+    
+    return rc;
+}
+
+error_t scan_item(int *indx, FILE *file, item_t *items)
+{
+    error_t rc;
+    char line[MAX_LINE_LEN];
+    double mass = 0.0, volume = 0.0;
+    
+    rc = read_name(file, line, sizeof(line), *indx);
+    if (rc == OK) 
+    {
+        rc = read_mass_volume(file, &mass, &volume);
+    }
         
-        if (strlen(line) >= MAX_NAME_LEN)
-        {
-            *rc = ERROR_NAME_TOO_LONG;
-            continue;
-        }
-
-        int mass_read = file_read_line(file, mass_line, sizeof(mass_line));
-        int volume_read = file_read_line(file, vol_line, sizeof(vol_line));
-        if (!mass_read || !volume_read)
-        {
-            *rc = ERROR_NOT_ENOUGH_DATA;
-            continue;
-        }
-
-        double mass, volume;
-        *rc = analyze_data(mass_line, vol_line, &mass, &volume);
-        if (*rc != OK)
-            continue;
-
+    if (rc == OK)
+    {
         append_struct_item(mass, volume, line, *indx, items);
         ++(*indx);
     }
+    
+    return rc;
+}
 
-    if (*indx == MAX_AR_LEN && !feof(file))
+void scan_struct(error_t *rc, int *indx, FILE *file, item_t *items)
+{
+    while (*indx < MAX_AR_LEN && *rc == OK && !feof(file))
+    {
+        *rc = scan_item(indx, file, items);
+    }
+
+    if (*indx == MAX_AR_LEN && !feof(file) && *rc == OK)
+    {
         *rc = ERROR_TOO_MANY_STRINGS;
+    }
 }
 
 error_t handle_struct_scan(item_t *items, const char *filename, int *count_ptr)
 {
     error_t rc = OK;
     FILE* file = fopen(filename, "r");
-
     if (file == NULL)
         rc = ERROR_FILE_OPEN;
     else 
     {
-        int indx = 0;
-        scan_struct(&rc, &indx, file, items);
-
-        fclose(file);
-        if (indx == 0 && rc == OK)
+        fseek(file, 0, SEEK_END);
+        long file_size = ftell(file);
+        if (file_size == 0)
         {
             rc = ERROR_EMPTY_FILE;
         }
+        else
+        {
+            fseek(file, 0, SEEK_SET);
+            int indx = 0;
+            scan_struct(&rc, &indx, file, items);
 
-        *count_ptr = indx;
+            if (indx == 0 && rc == OK)
+            {
+                rc = ERROR_EMPTY_FILE;
+            }
+
+            *count_ptr = indx;
+        }
     }
 
+    if (file != NULL)
+        fclose(file);
     return rc;
 }
 
@@ -115,8 +149,9 @@ void sort_struct(item_t *items, int count)
 {
     for (int i = 1; i < count; i++)
     {
+        int flag = 1;
         int k = i;
-        while (k > 0)
+        while (k > 0 && flag)
         {
             double ratio1 = items[k - 1].weight / items[k - 1].volume;
             double ratio2 = items[k].weight / items[k].volume;
@@ -127,7 +162,7 @@ void sort_struct(item_t *items, int count)
                 k--;
             } 
             else
-                break;
+                flag = 0;
         }
     }
 }
