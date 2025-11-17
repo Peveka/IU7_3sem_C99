@@ -1,25 +1,28 @@
+#include <stddef.h>
 #include "list_struct.h"
 #include "alloc_memory.h"
 #include "errors.h"
+
 error_t create_footballer_node(const char *surname, int goals, node_t **new_node)
 {
     error_t rc = OK;
     footballer_t *fb = NULL;
     node_t *node = NULL;
+
     fb = footballer_alloc(surname, goals);
     if (fb == NULL)
-        rc = ERR_NOT_ENOUGH_DATA;
+        rc = ERR_MEM_ALLOC;
     
     if (rc == OK)
     {
-        node = malloc(sizeof(node_t));
+        node = node_alloc(); 
         if (node == NULL)
         {
             footballer_free(fb);
-            rc = ERR_NOT_ENOUGH_DATA;
+            rc = ERR_MEM_ALLOC;
         }
     }
-    
+
     if (rc == OK)
     {
         node->data = fb;
@@ -34,10 +37,13 @@ void delete_elem(node_t **head, node_t *elem)
 {
     if (!head || *head == NULL || !elem)
         return;
+    footballer_t *data_to_free = (footballer_t*)elem->data;
+    
     int should_delete_flag = 1;
     if (*head == elem)
     {
         *head = elem->next;
+        footballer_free(data_to_free);
         free_elem(elem);
         should_delete_flag = 0;
     }
@@ -46,6 +52,7 @@ void delete_elem(node_t **head, node_t *elem)
         if (cur->next == elem)
         {
             cur->next = elem->next;
+            footballer_free(data_to_free);
             free_elem(elem);
             should_delete_flag = 0;
         }

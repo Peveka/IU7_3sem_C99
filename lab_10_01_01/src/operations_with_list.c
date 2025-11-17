@@ -1,7 +1,9 @@
+#include <string.h>
 #include "list_struct.h"
 #include "alloc_memory.h"
 #include "data.h"
-#include <string.h>
+#include "operations_with_elem.h"
+#include "errors.h"
 
 void list_init(node_t **head)
 {
@@ -12,10 +14,12 @@ void list_delete(node_t **head)
 {
     if (!head) 
         return;
-    for(node_t *cur_elem = *head; cur_elem;)
+    for(node_t *cur_elem = *head; cur_elem; )
     {
         node_t *prev_elem = cur_elem;
         cur_elem = cur_elem->next;
+        footballer_free((footballer_t*)prev_elem->data);
+        
         free_elem(prev_elem); 
     }
     *head = NULL;
@@ -44,8 +48,6 @@ error_t list_filter(node_t **head, int min_goal_count)
 {
     if (!head || !*head)
         return ERR_INVALID_DATA;
-    
-    remove_duplicates(head, footballers_eq);
     for (node_t *current = *head; current != NULL;)
     {
         footballer_t *fb = (footballer_t*)current->data;

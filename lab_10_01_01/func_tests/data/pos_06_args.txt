@@ -1,0 +1,1 @@
+/func_tests/data/pos_06_in.txt out/pos_06_result.txt 1

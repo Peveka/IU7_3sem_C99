@@ -13,6 +13,11 @@ void free_elem(node_t *elem)
     free(elem);
 }
 
+node_t *node_alloc(void)
+{
+    return malloc(sizeof(node_t));
+}
+
 footballer_t *footballer_alloc(const char *surname, int goals_count)
 {
     footballer_t *fb = alloc_elem();
