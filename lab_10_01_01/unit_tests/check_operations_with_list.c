@@ -1,7 +1,9 @@
 #include <check.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "list_struct.h"
+#include "list_sort.h"
 #include "operations_with_elem.h"
 #include "operations_with_list.h"
 #include "compare_functions.h"
@@ -10,7 +12,7 @@
 
 Suite *operations_with_elem_suite(void);
 
-node_t *create_test_node(const char *surname, int goals)
+static node_t *create_test_node(const char *surname, int goals)
 {
     node_t *new_node = NULL;
     create_footballer_node(surname, goals, &new_node);
@@ -31,28 +33,39 @@ START_TEST(test_add_to_empty)
 }
 END_TEST
 
-START_TEST(test_remove_non_adjacent_dupes)
+START_TEST(test_remove_non_adjacent_footballers)
 {
-    node_t *head = create_test_node("A", 5);
-    node_t *b_node = create_test_node("B", 1); 
-    node_t *c_node = create_test_node("C", 10); 
-    add_node_to_list(&head, b_node);
+    node_t *head = NULL;
+    
     add_node_to_list(&head, create_test_node("A", 5));
-    add_node_to_list(&head, c_node);
+    add_node_to_list(&head, create_test_node("B", 1)); 
+    add_node_to_list(&head, create_test_node("A", 5));
+    add_node_to_list(&head, create_test_node("C", 10));
     
     remove_duplicated(&head, footballers_eq);
 
     ck_assert_ptr_nonnull(head);
-    ck_assert_str_eq(((footballer_t*)head->data)->surname, "A");
-    ck_assert_ptr_eq(head->next, b_node);
-    ck_assert_ptr_eq(head->next->next, c_node);
-    ck_assert_ptr_eq(head->next->next->next, NULL);
+    node_t *current = head;
+    ck_assert_str_eq(((footballer_t*)current->data)->surname, "A");
+    ck_assert_int_eq(((footballer_t*)current->data)->goals_count, 5);
+    
+    current = current->next;
+    ck_assert_ptr_nonnull(current);
+    ck_assert_str_eq(((footballer_t*)current->data)->surname, "B");
+    ck_assert_int_eq(((footballer_t*)current->data)->goals_count, 1);
+    
+    current = current->next;
+    ck_assert_ptr_nonnull(current);
+    ck_assert_str_eq(((footballer_t*)current->data)->surname, "C");
+    ck_assert_int_eq(((footballer_t*)current->data)->goals_count, 10);
+    
+    ck_assert_ptr_eq(current->next, NULL);
     
     list_delete(&head);
 }
 END_TEST
 
-START_TEST(test_remove_full_dupes_list)
+START_TEST(test_remove_full_footballers_list)
 {
     node_t *head = create_test_node("A", 5);
     add_node_to_list(&head, create_test_node("A", 5));
@@ -61,6 +74,8 @@ START_TEST(test_remove_full_dupes_list)
     remove_duplicated(&head, footballers_eq);
 
     ck_assert_ptr_nonnull(head);
+    ck_assert_str_eq(((footballer_t*)head->data)->surname, "A");
+    ck_assert_int_eq(((footballer_t*)head->data)->goals_count, 5);
     ck_assert_ptr_eq(head->next, NULL);
     
     list_delete(&head);
@@ -116,8 +131,8 @@ Suite *operations_with_list_suite(void)
     suite_add_tcase(s, tc_add);
 
     tc_remove = tcase_create("RemoveDuplicates");
-    tcase_add_test(tc_remove, test_remove_non_adjacent_dupes);
-    tcase_add_test(tc_remove, test_remove_full_dupes_list);
+    tcase_add_test(tc_remove, test_remove_non_adjacent_footballers);
+    tcase_add_test(tc_remove, test_remove_full_footballers_list);
     suite_add_tcase(s, tc_remove);
 
     tc_sort = tcase_create("Sort");

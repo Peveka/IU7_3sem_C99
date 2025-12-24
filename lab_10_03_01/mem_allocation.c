@@ -18,7 +18,7 @@ assoc_array_error_t key_allocate(char **key, int key_size)
 {
     if (key == NULL || key_size <= 0)
         return ASSOC_ARRAY_INVALID_PARAM;
-    *key = malloc(key_size*sizeof(char));
+    *key = malloc(key_size * sizeof(char));
     return (*key != NULL) ? ASSOC_ARRAY_OK : ASSOC_ARRAY_MEM;
 }
 

@@ -5,6 +5,8 @@
 
 error_t create_footballer_node(const char *surname, int goals, node_t **new_node)
 {
+    if (!surname || goals < 0 || !new_node)
+        return ERR_INVALID_DATA;
     error_t rc = OK;
     footballer_t *fb = NULL;
     node_t *node = NULL;
@@ -37,24 +39,24 @@ void delete_elem(node_t **head, node_t *elem)
 {
     if (!head || *head == NULL || !elem)
         return;
-    footballer_t *data_to_free = (footballer_t*)elem->data;
-    
-    int should_delete_flag = 1;
+        
     if (*head == elem)
     {
         *head = elem->next;
-        footballer_free(data_to_free);
+        footballer_free((footballer_t*)elem->data);
         free_elem(elem);
-        should_delete_flag = 0;
     }
-    for (node_t *cur = *head; should_delete_flag && cur != NULL; cur = cur->next)
+    else
     {
-        if (cur->next == elem)
+        node_t *current = *head;
+        while (current->next != NULL && current->next != elem)
+            current = current->next;
+        
+        if (current->next == elem)
         {
-            cur->next = elem->next;
-            footballer_free(data_to_free);
+            current->next = elem->next;
+            footballer_free((footballer_t*)elem->data);
             free_elem(elem);
-            should_delete_flag = 0;
         }
     }
 }

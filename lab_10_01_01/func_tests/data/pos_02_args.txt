@@ -1,1 +1,1 @@
-/func_tests/data/pos_02_in.txt out/pos_02_result.txt 0
+./func_tests/data/pos_02_in.txt out/pos_02_result.txt 0

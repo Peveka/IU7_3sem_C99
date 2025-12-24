@@ -9,7 +9,7 @@ assoc_array_t assoc_array_create(void)
 {
     assoc_array_t array = array_alloc();
     if (array != NULL)
-        array-> head = NULL;
+        array->head = NULL;
     return array;
 }
 
@@ -53,11 +53,11 @@ assoc_array_error_t assoc_array_insert(assoc_array_t arr, const char *key, int n
         else if (rc == ASSOC_ARRAY_OK)
         {   
             node_t *cur_node = arr->head;
-            for (; cur_node->next != NULL; cur_node = cur_node->next) {}
+            for (; cur_node->next != NULL; cur_node = cur_node->next);
             cur_node->next = node_to_insert;
         }
         else if (rc == ASSOC_ARRAY_MEM)
-            assoc_array_destroy(&arr);
+            list_free(arr);
     }
 
     return rc;
@@ -72,7 +72,7 @@ assoc_array_error_t assoc_array_remove(assoc_array_t arr, const char *key)
     assoc_array_error_t rc = ASSOC_ARRAY_OK;
 
     if (searched_node != NULL)
-        rc = delete_node(&arr, searched_node);
+        rc = delete_node(arr, searched_node);
     else
         rc = ASSOC_ARRAY_NOT_FOUND;
 

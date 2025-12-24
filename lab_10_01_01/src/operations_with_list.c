@@ -12,50 +12,84 @@ void list_init(node_t **head)
 
 void list_delete(node_t **head)
 {
-    if (!head) 
+    if (!head || *head == NULL) 
         return;
-    for(node_t *cur_elem = *head; cur_elem; )
+
+    node_t *current = *head;
+    node_t *next_node;
+    
+    while (current != NULL)
     {
-        node_t *prev_elem = cur_elem;
-        cur_elem = cur_elem->next;
-        footballer_free((footballer_t*)prev_elem->data);
+        next_node = current->next;
+        footballer_free((footballer_t*)current->data);
+        free_elem(current);                            
         
-        free_elem(prev_elem); 
+        current = next_node;
     }
     *head = NULL;
 }
 
 void remove_duplicated(node_t **head, comparator_ptr comparator)
 {
-    if (!head || !*head || !comparator)
+    if (!head || !*head || !comparator) 
         return;
-    node_t *cur_elem = *head;
-    for (;cur_elem; cur_elem=cur_elem->next)
-        for (node_t *next_elem = cur_elem->next; next_elem;)
+    
+    node_t *current = *head;
+    
+    while (current != NULL)
+    {
+        node_t *runner = current;
+        
+        while (runner->next != NULL)
         {
-            if (comparator(cur_elem->data, next_elem->data) == 0)
+            if (comparator(current->data, runner->next->data))
             {
-                node_t *dublicate_elem = next_elem;
-                next_elem = next_elem->next;
-                delete_elem(head, dublicate_elem);
+                node_t *duplicate = runner->next;
+                runner->next = duplicate->next;
+                footballer_free((footballer_t*)duplicate->data);
+                free_elem(duplicate);
             }
             else
-                next_elem = next_elem->next;
-        }          
+            {
+                runner = runner->next;
+            }
+        }
+        current = current->next;
+    }
 }
 
 error_t list_filter(node_t **head, int min_goal_count)
 {
     if (!head || !*head)
         return ERR_INVALID_DATA;
-    for (node_t *current = *head; current != NULL;)
+    
+    node_t *current = *head;
+    node_t *prev = NULL;
+
+    while (current != NULL)
     {
         footballer_t *fb = (footballer_t*)current->data;
-        node_t *next = current->next;
         
         if (fb->goals_count < min_goal_count)
-            delete_elem(head, current);
-        current = next;
+        {
+            node_t *to_delete = current;
+            current = current->next;           
+            if (to_delete == *head)
+            {
+                delete_elem(head, to_delete);
+            }
+            else
+            {
+                prev->next = current; 
+                footballer_free((footballer_t*)to_delete->data);
+                free_elem(to_delete);
+            }
+        }
+        else
+        {
+            prev = current;
+            current = current->next;
+        }
     }
     
     return OK;
@@ -77,7 +111,6 @@ error_t add_node_to_list(node_t **head, node_t *new_node)
             current = current->next;
         current->next = new_node;
     }
-    
     new_node->next = NULL;
     
     return rc;

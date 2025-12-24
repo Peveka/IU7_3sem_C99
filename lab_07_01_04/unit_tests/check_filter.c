@@ -8,7 +8,7 @@ START_TEST(key_empty_arr)
 {
     int arr[] = {0, 1};
     int *pb_s = arr;
-    int *pe_s = pb_s;
+    int *pe_s = pb_s; // пустой массив
     int *pb_d;
     int *pe_d;
     int rc;
@@ -20,10 +20,9 @@ END_TEST
 
 START_TEST(key_null_src)
 {
-    int arr[] = {0, 1};
-    int *pb_s = arr;
+    int *pb_s = NULL;
     int *pe_s = NULL;
-    int *pb_d; 
+    int *pb_d;
     int *pe_d;
     int rc = key(pb_s, pe_s, &pb_d, &pe_d);
 
@@ -58,13 +57,14 @@ END_TEST
 
 START_TEST(key_empty_out_arr)
 {
-    int arr[] = {1, 1, 1}; // Avg 1.0
+    int arr[] = {1, 1, 1}; // Avg 1.0, все элементы = среднему
     int *pb_s = arr;
     int *pe_s = arr + 3;
     int *pb_d, *pe_d;
     int rc = key(pb_s, pe_s, &pb_d, &pe_d);
 
     ck_assert_int_eq(rc, ERROR_EMPTY_RESULT);
+    ck_assert_ptr_null(pb_d);
 }
 END_TEST
 
@@ -124,7 +124,6 @@ START_TEST(key_normal_case_third_test)
     free(pb_d);
 }
 END_TEST
-
 
 START_TEST(key_negative_numbers)
 {

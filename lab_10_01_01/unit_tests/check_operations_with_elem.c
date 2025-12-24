@@ -8,7 +8,7 @@
 #include "errors.h"
 #include "memory_alloc.h"
 
-node_t *create_test_node(const char *surname, int goals)
+static node_t *create_test_node(const char *surname, int goals)
 {
     node_t *new_node = NULL;
     create_footballer_node(surname, goals, &new_node);

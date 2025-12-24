@@ -5,7 +5,7 @@ OBJS := out/main.o out/compare_functions.o out/args_handler.o out/file_io.o out/
 CHECK_OBJS_SRC = out/check_operations_with_elem.o out/check_operations_with_list.o
 CHECK_OBJS = $(CHECK_OBJS_SRC) $(filter-out out/main.o,$(OBJS))
 
-all : app.exe
+all : app.exe unit_tests.exe
 
 app.exe : $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^

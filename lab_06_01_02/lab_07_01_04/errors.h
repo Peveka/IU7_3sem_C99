@@ -1,0 +1,16 @@
+#ifndef ERRORS_H__
+
+#define ERRORS_H__
+
+typedef enum
+{
+    OK,
+    ERROR_INVALID_DATA,
+    ERROR_FILE_OPEN,
+    ERROR_EMPTY_FILE,
+    ERROR_MEMORY_ALLOCATION,
+    ERROR_NOT_ENOUGH_ARGUMENTS,
+    ERROR_TOO_MANY_ARGUMENTS,
+} error_t;
+
+#endif

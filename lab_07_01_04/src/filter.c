@@ -3,7 +3,7 @@
 #include "sort.h"
 #include "errors.h"
 
-double get_average_value(const int *pb_src, const int *pe_src)
+static double get_average_value(const int *pb_src, const int *pe_src)
 {
     double sum = 0;
     int count = 0;
@@ -15,12 +15,12 @@ double get_average_value(const int *pb_src, const int *pe_src)
     return count > 0 ? sum / count : 0;
 }
 
-int filter_func(int value, double average)
+static int filter_func(int value, double average)
 {
     return ((double)value > average);
 }
 
-int get_filtered_len(const int *start, const int *end)
+static int get_filtered_len(const int *start, const int *end)
 {
     int count = 0;
     double average = get_average_value(start, end);
@@ -33,10 +33,9 @@ int get_filtered_len(const int *start, const int *end)
     return count;
 }
 
-int *move_digits_to_ar(const int *src, int src_len, int *dst)
+static int *move_digits_to_ar(const int *src, int src_len, int *dst, double average)
 {
     int index = 0;
-    double average = get_average_value(src, src + src_len);
     for (int i = 0; i < src_len; ++i)
     {
         if (filter_func(*(src + i), average))
@@ -54,9 +53,10 @@ int key(const int *pb_src, const int *pe_src, int **pb_dst, int **pe_dst)
     error_t rc = OK;
     int src_len = 0;
     int filter_count = 0;
+    int *temp_pb_dst = NULL;
+    double average = 0;
 
-    // Проверка входных параметров
-    if (!pb_src || !pe_src || !pb_dst || !pe_dst)
+    if (pb_src == NULL || pe_src == NULL || pb_dst == NULL || pe_dst == NULL)
         rc = ERROR_INVALID_DATA;
 
     if (rc == OK && pb_src >= pe_src)
@@ -73,14 +73,31 @@ int key(const int *pb_src, const int *pe_src, int **pb_dst, int **pe_dst)
 
     if (rc == OK)
     {
-        *pb_dst = malloc(filter_count * sizeof(int));
-        if (*pb_dst == NULL)
+        temp_pb_dst = malloc(filter_count * sizeof(int));
+        if (temp_pb_dst == NULL)
             rc = ERROR_MEMORY_ALLOCATION;
     }
 
     if (rc == OK)
     {
-        *pe_dst = move_digits_to_ar(pb_src, src_len, *pb_dst);
+        average = get_average_value(pb_src, pe_src);
+        *pe_dst = move_digits_to_ar(pb_src, src_len, temp_pb_dst, average);
+        *pb_dst = temp_pb_dst;
+        temp_pb_dst = NULL;
+    }
+
+    if (temp_pb_dst != NULL)
+    {
+        free(temp_pb_dst);
+        temp_pb_dst = NULL;
+    }
+
+    if (rc != OK)
+    {
+        if (pb_dst != NULL)
+            *pb_dst = NULL;
+        if (pe_dst != NULL)
+            *pe_dst = NULL;
     }
 
     return rc;

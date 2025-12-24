@@ -2,63 +2,36 @@
 #include <string.h>
 #include <stdlib.h>
 #include "errors.h"
-#include "file_funcs.h"
+#include "file_io.h"
 #include "sort.h"
 #include "mode.h"
 #include "filter.h"
+#include "memory.h"
+#include "source_data_handler.h"
 
-int main(int argc, char **argv) 
+int main(int argc, char **argv)
 {
-    error_t rc = OK;
-    rc = args_handle(argc);
-    mode_t filter_flag = mode_define(argc, argv); 
-    
-    if (filter_flag == UNKNOWN_MODE)
-        rc = ERROR_UNKWN_MODE;
+    error_t rc = args_handle(argc);
+    mode_t filter_mode = mode_define(argc, argv);
 
-    const char *src_filename;
-    const char *dest_filename;
-    int len = 0;
+    if (filter_mode == UNKNOWN_MODE)
+        rc = ERROR_UNKNOWN_MODE;
+
+    int array_length = 0;
+    int *source_array = NULL;
+    int *filtered_array_begin = NULL;
+    int *filtered_array_end = NULL;
+    if (rc == OK)
+        rc = load_and_read_source_file(argv[1], &source_array, &array_length);
+
+    if (rc == OK && filter_mode == FILTER)
+        rc = key(source_array, source_array + array_length, &filtered_array_begin, &filtered_array_end);
 
     if (rc == OK)
-    {
-        src_filename = argv[1];
-        dest_filename = argv[2];
-        rc = get_file_len(src_filename, &len); 
-    }
+        rc = sort_and_save_to_file(argv[2], source_array, array_length, filtered_array_begin, filtered_array_end, filter_mode);
+        
+    free_memory((void **)&source_array);
+    free_memory((void **)&filtered_array_begin);
 
-    int *src_ar = NULL;
-    int *filt_ar_begin = NULL;
-    int *filt_ar_end = NULL;
-    
-    if (rc == OK)
-    {
-        src_ar = malloc(len * sizeof(int));
-        if (src_ar == NULL)
-            rc = ERROR_MEMORY_ALLOCATION;
-    }
-
-    if (rc == OK)
-        rc = read_file_digits(src_ar, len, src_filename);
-
-    if (filter_flag && rc == OK)
-        rc = key(src_ar, src_ar + len, &filt_ar_begin, &filt_ar_end);
-
-    if (rc == OK)
-    {
-        if (filter_flag)
-        {
-            mysort(filt_ar_begin, filt_ar_end - filt_ar_begin, sizeof(int), cmp_int);
-            rc = write_file_digits(dest_filename, filt_ar_begin, filt_ar_end - filt_ar_begin);
-        }
-        else
-        {
-            mysort(src_ar, len, sizeof(int), cmp_int);
-            rc = write_file_digits(dest_filename, src_ar, len);
-        }
-    }
-
-    free(src_ar);
-    free(filt_ar_begin);
     return rc;
 }

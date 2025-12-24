@@ -1,0 +1,19 @@
+#ifndef ERROR_H__
+#define ERROR_H__
+
+typedef enum
+{
+    OK = 0,
+    ERR_UNKNOWN_MODE,
+    ERR_MEMORY_ALLOC,
+    ERR_NOT_ENOUGH_ARGS,
+    ERR_NOT_ENOUGH_DATA,
+    ERR_INVALID_DATA,
+    ERR_MATRIX_DIMENSIONS,
+    ERR_INVALID_FILE,
+    ERR_EXTRA_DATA_IN_FILE,
+    ERR_SEARCH_INVERSE_MATRIX,
+    ERR_FILE_IS_EMPTY
+} error_t;
+
+#endif

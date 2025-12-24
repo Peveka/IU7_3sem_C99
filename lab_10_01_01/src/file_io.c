@@ -50,7 +50,6 @@ error_t write_file_data(node_t *head, const char *filename)
         file = fopen(filename, "w");
         if (file == NULL)
             rc = ERR_FILE_OPEN;
-        
     }
     
     if (rc == OK)

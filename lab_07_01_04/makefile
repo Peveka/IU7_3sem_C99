@@ -12,10 +12,10 @@ OUT_DIR := out
 CFLAGS += -Iinc
 
 # Флаги для unit-тестов
-UNIT_FLAGS := -lrt -lcheck -lpthread -lm
+UNIT_FLAGS := -lcheck -lrt -lpthread -lm
 
 # Основные объектные файлы
-OBJS := out/file_funcs.o out/filter.o out/mode.o out/sort.o
+OBJS := out/file_io.o out/filter.o out/mode.o out/sort.o out/memory.o out/source_data_handler.o
 
 # Цели по умолчанию
 all: app.exe unit_tests.exe
@@ -24,20 +24,27 @@ all: app.exe unit_tests.exe
 app.exe: $(OBJS) out/main.o
 	$(CC) -o app.exe $^
 
-out/main.o: src/main.c inc/errors.h inc/file_funcs.h inc/mode.h inc/filter.h
+out/main.o: src/main.c inc/errors.h inc/file_io.h inc/mode.h inc/filter.h inc/source_data_handler.h
 	$(CC) $(CFLAGS) -c src/main.c -o out/main.o
 
-out/file_funcs.o: src/file_funcs.c inc/file_funcs.h inc/errors.h
-	$(CC) $(CFLAGS) -c src/file_funcs.c -o out/file_funcs.o
+out/source_data_handler.o: src/source_data_handler.c inc/source_data_handler.h inc/filter.h inc/mode.h inc/errors.h
+	$(CC) $(CFLAGS) -c src/source_data_handler.c -o out/source_data_handler.o
+
+out/file_io.o: src/file_io.c inc/file_io.h inc/errors.h
+	$(CC) $(CFLAGS) -c src/file_io.c -o out/file_io.o
 
 out/filter.o: src/filter.c inc/filter.h inc/sort.h inc/errors.h
 	$(CC) $(CFLAGS) -c src/filter.c -o out/filter.o
+
+out/memory.o: src/memory.c inc/memory.h inc/errors.h
+	$(CC) $(CFLAGS) -c src/memory.c -o out/memory.o
 
 out/sort.o: src/sort.c inc/sort.h
 	$(CC) $(CFLAGS) -c src/sort.c -o out/sort.o
 
 out/mode.o: src/mode.c inc/mode.h
 	$(CC) $(CFLAGS) -c src/mode.c -o out/mode.o
+
 
 # Unit-тесты
 UNIT_OBJS := out/check_main.o out/check_filter.o out/check_sort.o

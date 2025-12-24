@@ -1,6 +1,7 @@
 #include "compare_functions.h"
 #include "data.h"
 #include <string.h>
+#include <stdio.h>
 
 int sort_footballers(const void *first, const void *second)
 {
@@ -22,5 +23,5 @@ int footballers_eq(const void *first, const void *second)
     const footballer_t *first_footballer = (const footballer_t*)first;
     const footballer_t *second_footballer = (const footballer_t*)second;
     return strcmp(first_footballer->surname, second_footballer->surname) == 0 && 
-           (first_footballer->goals_count == second_footballer->goals_count);
+        (first_footballer->goals_count == second_footballer->goals_count);
 }

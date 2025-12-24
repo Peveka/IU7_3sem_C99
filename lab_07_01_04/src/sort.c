@@ -1,9 +1,10 @@
 #include "sort.h"
 
-void swap_items(void *el1, void *el2, size_t elem_size)
+static void swap_items(void *el1, void *el2, size_t elem_size)
 {
     char *a = el1;
     char *b = el2;
+    
     for (size_t i = 0; i < elem_size; i++)
     {
         char temp = a[i];
@@ -14,51 +15,78 @@ void swap_items(void *el1, void *el2, size_t elem_size)
 
 int cmp_int(const void *num1, const void *num2)
 {
+    if (num1 == NULL || num2 == NULL)
+        return 0;
     const int *a = num1;
     const int *b = num2;
     return (*a < *b) ? -1 : (*a > *b);
 }
 
-void mysort(void *base, size_t num, size_t size, int (*compare)(const void *, const void *))
+static size_t forward_pass(void *base, size_t left, size_t right, size_t size, compare_func_t compare)
 {
-    if (num == 0)
+    size_t last_swap = left;
+    
+    for (size_t i = left; i < right; i++)
+    {
+        void *current = (char*)base + i * size;
+        void *next = (char*)base + (i + 1) * size;
+        
+        if (compare(current, next) > 0)
+        {
+            swap_items(current, next, size);
+            last_swap = i; 
+        }
+    }
+    
+    return last_swap;
+}
+
+static size_t backward_pass(void *base, size_t left, size_t right, size_t size, compare_func_t compare)
+{
+    size_t last_swap = right;
+    
+    for (size_t i = right; i > left; i--)
+    {
+        void *previous = (char*)base + (i - 1) * size;
+        void *current = (char*)base + i * size;
+        
+        if (compare(previous, current) > 0)
+        {
+            swap_items(previous, current, size);
+            last_swap = i; 
+        }
+    }
+    
+    return last_swap;
+}
+
+void mysort(void *base, size_t num, size_t size, compare_func_t compare)
+{
+    if (num == 0 || size == 0 || compare == NULL || base == NULL)
         return;
 
     size_t left = 0;
     size_t right = num - 1;
-    size_t last_swap;
-    int should_change = 1;
-    while (should_change && left < right)
-    {
-        last_swap = left;
-        for (size_t i = left; i < right; i++)
-        {
-            void *a = (char*)base + i * size;
-            void *b = (char*)base + (i + 1) * size;
-            if (compare(a, b) > 0)
-            {
-                swap_items(a, b, size);
-                last_swap = i;
-            }
-        }
-        right = last_swap;
-        if (left >= right)
-        {
-            should_change = 0;
-            continue;
-        }
+    int sorting_complete = 0; 
 
-        last_swap = right;
-        for (size_t i = right; i > left; i--)
+    while (left < right && !sorting_complete)
+    {
+        size_t new_right = forward_pass(base, left, right, size, compare);
+        size_t new_left;
+
+        if (new_right == right)
         {
-            void *a = (char*)base + (i - 1) * size;
-            void *b = (char*)base + i * size;
-            if (compare(a, b) > 0)
-            {
-                swap_items(a, b, size);
-                last_swap = i;
-            }
+            sorting_complete = 1;
         }
-        left = last_swap;
+        else
+        {
+            right = new_right;
+            new_left = backward_pass(base, left, right, size, compare);
+            
+            if (new_left == left)
+                sorting_complete = 1;
+            else
+                left = new_left;
+        }
     }
 }

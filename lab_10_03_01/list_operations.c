@@ -36,24 +36,24 @@ node_t *list_search(const assoc_array_t list, const char *key)
     return finded_elem;
 }
 
-assoc_array_error_t delete_node(assoc_array_t **arr, node_t *node_to_delete)
+assoc_array_error_t delete_node(assoc_array_t arr, node_t *node_to_delete)
 {
-    if (arr == NULL || *arr == NULL || node_to_delete == NULL)
+    if (arr == NULL || node_to_delete == NULL)
         return ASSOC_ARRAY_INVALID_PARAM;
     
     assoc_array_error_t rc = ASSOC_ARRAY_OK;    
-    if ((*arr)->head == node_to_delete)
+    if (arr->head == node_to_delete)
     {
-        node_t *removed_node = (*arr)->head;
-        (*arr)->head = (*arr)->head->next;
+        node_t *removed_node = arr->head;
+        arr->head = arr->head->next;
         node_free(removed_node);
     }
     else
     {
-        node_t *current_node = ((*arr)->head->next);
-        node_t *prev_node = ((*arr)->head);
+        node_t *current_node = arr->head->next;
+        node_t *prev_node = arr->head;
         int should_search_flag = 1;
-        for (;should_search_flag && current_node != NULL; )
+        for (; should_search_flag && current_node != NULL;)
         {
             if (current_node == node_to_delete)
             {
