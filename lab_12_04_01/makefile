@@ -14,11 +14,11 @@ UNIT_DIR := unit_tests
 LIB_NAME := libarrayproc
 LIB_STATIC := $(LIB_DIR)/$(LIB_NAME).a
 LIB_DYNAMIC := $(LIB_DIR)/$(LIB_NAME).so
-LIB_OBJS := $(OUT_DIR)/array_processor.o $(OUT_DIR)/file_io.o $(OUT_DIR)/filter.o $(OUT_DIR)/sort.o
+LIB_OBJS := $(OUT_DIR)/array_processor.o $(OUT_DIR)/file_io.o $(OUT_DIR)/filter.o $(OUT_DIR)/sort.o $(OUT_DIR)/memory.o
 
 APP_OBJS := $(OUT_DIR)/main.o $(OUT_DIR)/mode.o $(OUT_DIR)/memory.o
 
-UNIT_FLAGS := -lcheck -lm -lpthread -lrt -lsubunit # Адаптируй под OS
+UNIT_FLAGS := -lcheck -lm -lpthread -lrt -lsubunit
 UNIT_OBJS := $(OUT_DIR)/check_main.o $(OUT_DIR)/check_filter.o $(OUT_DIR)/check_sort.o
 
 all: static dynamic dl unit_tests
@@ -51,6 +51,6 @@ $(OUT_DIR) $(LIB_DIR):
 	mkdir -p $@
 
 clean:
-	rm -rf $(OUT_DIR)/*.o $(LIB_DIR)/*.a $(LIB_DIR)/*.so app_*.exe unit_tests.exe
+	rm -rf $(OUT_DIR)/*.o $(LIB_DIR)/*.a $(LIB_DIR)/*.so *.exe
 
 .PHONY: all static dynamic dl unit_tests clean

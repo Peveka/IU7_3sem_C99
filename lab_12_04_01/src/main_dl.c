@@ -11,27 +11,27 @@ static error_t load_library_functions(void *handle, load_array_from_file_t *load
 {
     error_t rc = OK;
     
-    *load_func = (load_array_from_file_t)dlsym(handle, "load_array_from_file");
+    *(void **)load_func = dlsym(handle, "load_array_from_file");
     if (dlerror() != NULL)
         rc = ERR_UNIT_FAIL;
 
     if (rc == OK)
     {
-        *filter_func = (filter_array_t)dlsym(handle, "filter_array");
+        *(void **)filter_func = dlsym(handle, "filter_array");
         if (dlerror() != NULL)
             rc = ERR_UNIT_FAIL;
     }
 
     if (rc == OK)
     {
-        *sort_func = (sort_array_t)dlsym(handle, "sort_array");
+        *(void **)sort_func = dlsym(handle, "sort_array");
         if (dlerror() != NULL)
             rc = ERR_UNIT_FAIL;
     }
 
     if (rc == OK)
     {
-        *save_func = (save_array_to_file_t)dlsym(handle, "save_array_to_file");
+        *(void **)save_func = dlsym(handle, "save_array_to_file");
         if (dlerror() != NULL)
             rc = ERR_UNIT_FAIL;
     }
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
     {
         filter_mode = mode_define(argc, argv);
         if (filter_mode == UNKNOWN_MODE)
-            rc = ERROR_UNKWN_MODE;
+            rc = ERROR_UNKNOWN_MODE;
     }
 
     if (rc == OK)

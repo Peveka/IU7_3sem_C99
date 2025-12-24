@@ -2,6 +2,7 @@
 #include "errors.h"
 #include "mode.h"
 #include "array_processor.h"
+#include "memory.h"
 
 int main(int argc, char **argv)
 {
@@ -14,7 +15,7 @@ int main(int argc, char **argv)
     {
         filter_mode = mode_define(argc, argv);
         if (filter_mode == UNKNOWN_MODE)
-            rc = ERROR_UNKWN_MODE;
+            rc = ERROR_UNKNOWN_MODE;
     }
 
     if (rc == OK)
@@ -24,13 +25,13 @@ int main(int argc, char **argv)
     result_end = source_array + source_len;
 
     if (rc == OK && filter_mode == FILTER)
-        rc = allocate_memory_with_check(source_len * sizeof(int), (void **)&filtered_buffer);
+        rc = allocate_memory_with_check(source_len * sizeof(int), (void **)&filtered_array);
 
     if (rc == OK && filter_mode == FILTER)
-        rc = filter_array(source_array, source_array + source_len, filtered_buffer, &result_end);
+        rc = filter_array(source_array, source_array + source_len, filtered_array, &result_end);
 
     if (rc == OK && filter_mode == FILTER)
-        result_begin = filtered_buffer;
+        result_begin = filtered_array;
 
     if (rc == OK)
         rc = sort_array(result_begin, result_end);
@@ -39,7 +40,7 @@ int main(int argc, char **argv)
         rc = save_array_to_file(argv[2], result_begin, result_end);
 
     free_memory((void **)&source_array);
-    free_memory((void **)&filtered_buffer);
+    free_memory((void **)&filtered_array);
 
     return rc;
 }

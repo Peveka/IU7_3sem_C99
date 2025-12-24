@@ -1,4 +1,3 @@
-// src/array_processor.c
 #include "array_processor.h"
 #include "file_io.h"
 #include "filter.h"

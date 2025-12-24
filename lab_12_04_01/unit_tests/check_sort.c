@@ -63,7 +63,7 @@ START_TEST(mysort_empty)
 {
     int arr[] = {};
     mysort(arr, 0, sizeof(int), cmp_int);
-    ck_assert_int_eq(1, 1);
+    ck_assert_int_eq(1, 1); // Просто проверка, что не упало
 }
 END_TEST
 

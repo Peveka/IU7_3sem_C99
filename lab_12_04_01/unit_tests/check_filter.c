@@ -49,7 +49,7 @@ END_TEST
 
 START_TEST(key_normal_case)
 {
-    int src[] = {1, 2, 3, 4, 5};
+    int src[] = {1, 2, 3, 4, 5};  // avg = 3.0 → >3: 4,5
     int expected[] = {4, 5};
     int *dst_buffer = NULL;
     int *dst_end = NULL;
@@ -86,7 +86,7 @@ END_TEST
 
 START_TEST(key_negative_numbers)
 {
-    int src[] = {-5, -3, -1, 0};
+    int src[] = {-5, -3, -1, 0};  // avg = -2.25 → >-2.25: -1, 0
     int expected[] = {-1, 0};
     int *dst_buffer = NULL;
     int *dst_end = NULL;

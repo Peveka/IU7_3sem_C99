@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include "filter.h"
 #include "errors.h"
 
