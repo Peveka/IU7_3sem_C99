@@ -1,0 +1,50 @@
+Описание публичного интерфейса библиотеки arrayproc (libarrayproc)
+
+/**
+ * Загружает массив целых чисел из файла.
+ * @param filename имя входного файла
+ * @param array    указатель на переменную, куда будет записан указатель на массив
+ * @param length   указатель на переменную, куда будет записана длина массива
+ * @return OK при успехе, код ошибки в противном случае
+ * 
+ * Функция выделяет память под массив (с помощью allocate_memory_with_check).
+ * Вызывающий код обязан освободить память через free_memory.
+ */
+error_t load_array_from_file(const char *filename, int **array, int *length);
+
+/**
+ * Фильтрует массив: оставляет только элементы, строго превышающие среднее арифметическое.
+ * @param src_begin начало исходного массива
+ * @param src_end   конец исходного массива (не входит в диапазон)
+ * @param dst_buffer уже выделенный буфер размером не менее (src_end - src_begin)
+ * @param dst_end   указатель, куда будет записан конец отфильтрованного массива
+ * @return OK при успехе, ERROR_EMPTY_RESULT если ничего не прошло фильтр,
+ *         ERROR_INVALID_DATA при некорректных параметрах
+ * 
+ * Функция не выделяет память — буфер передаётся извне.
+ */
+error_t filter_array(const int *src_begin, const int *src_end,
+                     int *dst_buffer, int **dst_end);
+
+/**
+ * Сортирует массив по возрастанию (по неубыванию).
+ * @param begin начало массива
+ * @param end   конец массива (не входит в диапазон)
+ * @return OK при успехе, ERROR_INVALID_DATA при некорректных параметрах
+ */
+error_t sort_array(int *begin, int *end);
+
+/**
+ * Сохраняет массив в текстовый файл (числа через пробел).
+ * @param filename имя выходного файла
+ * @param begin    начало массива
+ * @param end      конец массива (не входит в диапазон)
+ * @return OK при успехе, код ошибки при неудаче
+ */
+error_t save_array_to_file(const char *filename, const int *begin, const int *end);
+
+Используются вспомогательные модули. 
+Ввод-вывод: file_io.c
+Фильтрация: filter.c
+Сортировка: sort.c
+Управление памятью: memory.c
